@@ -1,0 +1,28 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from typing import List, Optional
+import openai
+import os
+from dotenv import load_dotenv
+from resume_gen.src.prompt_builder import generate_bullets
+
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+app = FastAPI(title="Resume Generator")
+
+class ExperienceInput(BaseModel):
+    experience: str = Field(..., min_length=10)
+    job_description: str = Field(..., min_length=20)
+    style: Optional[str] = Field(default="default", description="Choose from: default, concise, metrics, leadership, action")
+
+class BulletPointOutput(BaseModel):
+    bullets: List[str]
+
+@app.post("/generate-bullets", response_model=BulletPointOutput)
+def generate_resume_bullets(payload: ExperienceInput):
+    if not payload.experience or not payload.job_description:
+        raise HTTPException(status_code=400, detail="Experience and Job Description are required")
+
+    bullets = generate_bullets(payload.experience, payload.job_description, payload.style)
+    return {"bullets": bullets}
