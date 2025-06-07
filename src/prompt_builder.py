@@ -1,8 +1,28 @@
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv
+import re
+
+load_dotenv()
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+def extract_bullets_from_gemini(response):
+    try:
+        raw_text = response.candidates[0].content.parts[0].text
+    except Exception:
+        return ["Error: could not parse Gemini response"]
+    print("Raw text from Gemini response:", raw_text)
+    # Extract text between "**1." and "**2.", "**2." to end
+    bullets = re.findall(r"\*\*1\.\s*(.*?)\*\*\s*\*\*2\.\s*(.*?)\*\*", raw_text, re.DOTALL)
+
+    if bullets:
+        return [bullets[0][0].strip(), bullets[0][1].strip()]
+    else:
+        # fallback: match any bolded lines
+        fallback = re.findall(r"\*\*(.*?)\*\*", raw_text)
+        return fallback[:2] if fallback else [raw_text]
+    
 def generate_bullets(experience: str, job_description: str, style: str):
     style_instructions = {
         "default": "Use a clear, professional tone.",
@@ -33,10 +53,11 @@ Output:
 """
 
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-1.5-flash-001")
         response = model.generate_content(prompt)
-        content = response.text.strip()
-        bullets = [line.strip("-•0123456789. ").strip() for line in content.split("\n") if line.strip()]
+        # print("Gemini API response:", response)
+        # content = response.text.strip()
+        bullets = extract_bullets_from_gemini(response)
         return bullets[:2]
 
     except Exception as e:

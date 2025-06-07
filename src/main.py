@@ -1,13 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
-import openai
+# import openai
 import os
 from dotenv import load_dotenv
-from resume_gen.src.prompt_builder import generate_bullets
+from prompt_builder import generate_bullets
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI(title="Resume Generator")
 
