@@ -1,18 +1,17 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
-# import openai
 import os
 from dotenv import load_dotenv
-from prompt_builder import generate_bullets
+from llm import generate_bullets
 
 load_dotenv()
 
-app = FastAPI(title="Resume Generator")
+app = FastAPI(title="Resume Bullet Generator")
 
 class ExperienceInput(BaseModel):
-    experience: str = Field(..., min_length=10)
-    job_description: str = Field(..., min_length=20)
+    experience: str = Field(..., min_length=0)
+    job_description: str = Field(..., min_length=0)
     style: Optional[str] = Field(default="default", description="Choose from: default, concise, metrics, leadership, action")
 
 class BulletPointOutput(BaseModel):

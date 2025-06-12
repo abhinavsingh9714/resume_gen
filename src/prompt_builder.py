@@ -1,65 +1,37 @@
-import google.generativeai as genai
-import os
-from dotenv import load_dotenv
-import re
+from retriever import KnowledgeBaseRetriever
 
-load_dotenv()
+class PromptBuilder:
+    def __init__(self):
+        self.retriever = KnowledgeBaseRetriever()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    def build_prompt(self, experience: str, job_description: str = "", style: str = "metrics"):
+        # Step 1: Retrieve relevant knowledge base chunks
+        query = "How to write effective resume bullet points in {} style".format(style)
+        kb_chunks = self.retriever.retrieve(query, top_k=3)
 
-def extract_bullets_from_gemini(response):
-    try:
-        raw_text = response.candidates[0].content.parts[0].text
-    except Exception:
-        return ["Error: could not parse Gemini response"]
-    print("Raw text from Gemini response:", raw_text)
-    # Extract text between "**1." and "**2.", "**2." to end
-    bullets = re.findall(r"\*\*1\.\s*(.*?)\*\*\s*\*\*2\.\s*(.*?)\*\*", raw_text, re.DOTALL)
+        # Step 2: Combine retrieved content
+        guidance_section = "\n\n".join([f"• {chunk['content']}" for chunk in kb_chunks])
+        
+        # Step 3: Format final prompt
+        prompt = f"""
+You are a professional resume writer helping candidates craft impactful, ATS-optimized resume bullet points.
 
-    if bullets:
-        return [bullets[0][0].strip(), bullets[0][1].strip()]
-    else:
-        # fallback: match any bolded lines
-        fallback = re.findall(r"\*\*(.*?)\*\*", raw_text)
-        return fallback[:2] if fallback else [raw_text]
-    
-def generate_bullets(experience: str, job_description: str, style: str):
-    style_instructions = {
-        "default": "Use a clear, professional tone.",
-        "concise": "Use a compact, to-the-point tone with minimal filler.",
-        "metrics": "Prioritize quantifiable impact and performance metrics.",
-        "leadership": "Highlight leadership, collaboration, and decision-making.",
-        "action": "Use strong action verbs to convey initiative and ownership."
-    }
+Instructions:
+- Use the {style.upper()} style (e.g., STAR, XYZ) for the bullet points.
+- Focus on quantifiable outcomes, action verbs, and clarity.
+- Each bullet should be a single, clear sentence.
+- Do not invent fake results — only use provided information.
 
-    tone = style_instructions.get(style, style_instructions["default"])
+Knowledge base guidance:
+{guidance_section}
 
-    prompt = f"""
-You are a professional resume writer.
-
-Convert the following work experience into 2 recruiter-optimized, ATS-friendly bullet points for a professional resume.
-
-Apply the following tone: {tone}
-
-Experience:
+Candidate Experience:
 {experience}
 
-Target Job Description:
+Job Description:
 {job_description}
 
-Output:
-1.
-2.
-"""
+Now write 2 high-impact bullet points that match the job description and showcase the candidate’s achievements.
+""".strip()
 
-    try:
-        model = genai.GenerativeModel("gemini-1.5-flash-001")
-        response = model.generate_content(prompt)
-        # print("Gemini API response:", response)
-        # content = response.text.strip()
-        bullets = extract_bullets_from_gemini(response)
-        return bullets[:2]
-
-    except Exception as e:
-        print("Gemini API error:", e)
-        return ["Error generating bullet points.", str(e)]
+        return prompt
