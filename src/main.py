@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import os
 from dotenv import load_dotenv
-from llm import generate_bullets
+from src.llm import generate_bullets
 
 load_dotenv()
 

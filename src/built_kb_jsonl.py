@@ -2,10 +2,14 @@ import os
 import json
 from pathlib import Path
 from config import KB_INPUT_DIR, KB_CHUNK_FILE
+import spacy
 
-CHUNK_SIZE = 128  # Adjust based on optimal retrieval behavior
+# Load spaCy's small English model
+nlp = spacy.load("en_core_web_sm")
 
-def chunk_text(text, max_len=CHUNK_SIZE):
+CHUNK_SIZE = 512  # Adjust based on optimal retrieval behavior
+
+def chunk_text_paragraph(text, max_len=CHUNK_SIZE):
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
     chunks = []
     buffer = ""
@@ -21,6 +25,26 @@ def chunk_text(text, max_len=CHUNK_SIZE):
 
     return chunks
 
+def sliding_window_chunker(text, window_size=4, stride=2, max_tokens=CHUNK_SIZE):
+    """
+    Splits text into sentence-based overlapping chunks using spaCy.
+    Each chunk contains `window_size` sentences with `stride` overlap.
+    """
+    doc = nlp(text)
+    sentences = [sent.text.strip() for sent in doc.sents if sent.text.strip()]
+
+    chunks = []
+    i = 0
+    while i < len(sentences):
+        window = sentences[i:i + window_size]
+        chunk = " ".join(window).strip()
+        if len(chunk) > 0:
+            chunks.append(chunk)
+        i += stride
+
+    return chunks
+
+
 def process_files():
     os.makedirs(KB_CHUNK_FILE.parent, exist_ok=True)
     kb_entries = []
@@ -28,7 +52,7 @@ def process_files():
     for file_path in Path(KB_INPUT_DIR).glob("*.txt"):
         with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
-        chunks = chunk_text(text)
+        chunks = sliding_window_chunker(text, window_size=4, stride=2, max_tokens=CHUNK_SIZE)
         for chunk in chunks:
             kb_entries.append({"content": chunk})
 

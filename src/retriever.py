@@ -3,7 +3,7 @@ import faiss
 import numpy as np
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
-from config import KB_CHUNK_FILE, FAISS_INDEX_PATH, EMBEDDING_MODEL
+from src.config import KB_CHUNK_FILE, FAISS_INDEX_PATH, EMBEDDING_MODEL
 
 class KnowledgeBaseRetriever:
     def __init__(self):

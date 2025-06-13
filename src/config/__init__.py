@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Root directory (can be changed if needed)
-ROOT_DIR = Path("resume_gen")
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Paths
 KB_INPUT_DIR = ROOT_DIR / "knowledge_base"             # Folder with .txt files
@@ -14,4 +14,4 @@ FAISS_INDEX_PATH = KB_INDEX_DIR / "faiss.index"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # Gemini LLM model
-GEMINI_MODEL = "gemini-1.5-flash-001"
+GEMINI_MODEL = "models/gemini-1.5-flash"
