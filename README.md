@@ -16,8 +16,8 @@ A FastAPI-powered service that generates **ATS-optimized**, **quantified**, and 
 ---
 
 ## Project Structure
-'''
-resume_gen/
+
+```resume_gen/
 ├── kb_chunks/ # Chunked knowledge base (.jsonl)
 ├── kb_index/ # FAISS index files
 ├── knowledge_base/ # Raw .txt resume writing guides
@@ -32,21 +32,20 @@ resume_gen/
 │ └── feedback.py # (Optional) User feedback tracking
 ├── tests/ # Unit tests with pytest
 ├── requirements.txt
-└── README.md
-'''
+└── README.md```
 
 ---
 
 ## Setup Instructions
 
 ### 1. Clone and Setup Environment
-'''
-git clone https://github.com/yourname/resume-gen.git
+
+```git clone https://github.com/yourname/resume-gen.git
 cd resume-gen
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
-'''
+pip install -r requirements.txt```
+
 ### 2. Set Environment Variables
 Create a .env file in the root directory:
 
