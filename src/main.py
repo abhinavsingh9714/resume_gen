@@ -12,7 +12,7 @@ app = FastAPI(title="Resume Bullet Generator")
 class ExperienceInput(BaseModel):
     experience: str = Field(..., min_length=0)
     job_description: str = Field(..., min_length=0)
-    style: Optional[str] = Field(default="default", description="Choose from: default, concise, metrics, leadership, action")
+    style: Optional[str] = Field(default="default", description="STAR")
 
 class BulletPointOutput(BaseModel):
     bullets: List[str]

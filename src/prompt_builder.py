@@ -7,7 +7,7 @@ class PromptBuilder:
         self.use_gemini = use_gemini
         self.rewriter = QueryRewriter() if use_gemini else None
 
-    def build_prompt(self, experience: str, job_description: str = "", style: str = "xyz") -> str:
+    def build_prompt(self, experience: str, job_description: str = "", style: str = "STAR") -> str:
         # Step 1: Create query
         if self.use_gemini:
             query = self.rewriter.rewrite(experience, job_description, style)

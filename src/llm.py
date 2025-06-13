@@ -20,9 +20,9 @@ def extract_bullets_from_gemini(response):
     fallback = re.findall(r"\*\*(.*?)\*\*", raw_text)
     return fallback[:2] if fallback else [raw_text]
 
-def generate_bullets(experience: str, job_description: str, style: str = "default"):
+def generate_bullets(experience: str, job_description: str, style: str = "STAR"):
     try:
-        builder = PromptBuilder()
+        builder = PromptBuilder(use_gemini=True)
         prompt = builder.build_prompt(experience, job_description, style)
 
         model = genai.GenerativeModel(GEMINI_MODEL)
