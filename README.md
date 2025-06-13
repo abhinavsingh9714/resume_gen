@@ -115,7 +115,7 @@ The service employs a multi-step process to generate relevant results:
 - ***Real-Time ATS Score***: Integrate a feature to provide an estimated ATS score and keyword match analysis.
 - ***Personalization Engine***: Allow users to fine-tune the generation style based on their preferences.
 
-##Contributing
+## Contributing
 
 Contributions, bug reports, and feedback are highly welcome! Please feel free to open an issue or a pull request on the GitHub repository.
 
