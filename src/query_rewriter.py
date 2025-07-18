@@ -19,7 +19,6 @@ llm = ChatGoogleGenerativeAI(
     max_retries=2,
 )
 
-#original code:
 class QueryRewriter:
     def __init__(self):
         # self.model = genai.GenerativeModel(GEMINI_MODEL)

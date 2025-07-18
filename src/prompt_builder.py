@@ -3,7 +3,7 @@ from src.query_rewriter import QueryRewriter
 
 class PromptBuilder:
     def __init__(self, use_gemini: bool = True):
-        self.retriever = KnowledgeBaseRetriever()
+        self.retriever = KnowledgeBaseRetriever(3)
         self.use_gemini = use_gemini
         self.rewriter = QueryRewriter() if use_gemini else None
 
@@ -15,14 +15,14 @@ class PromptBuilder:
             query = self._build_fallback_query(experience, job_description, style)
         # print(f"Query for knowledge base: {query}")
         # Step 2: Retrieve chunks
-        kb_chunks = self.retriever.retrieve(query, top_k=3)
+        kb_chunks = self.retriever.retrieve(query)
 
         # Step 3: Fallback if weak results
-        if not kb_chunks or all(len(c["content"].strip()) < 50 for c in kb_chunks):
+        if not kb_chunks or all(len(c.strip()) < 50 for c in kb_chunks):
             fallback_query = f"Resume bullet writing in {style.upper()} style"
             kb_chunks = self.retriever.retrieve(fallback_query, top_k=3)
 
-        guidance_section = "\n\n".join([f"• {chunk['content']}" for chunk in kb_chunks])
+        guidance_section = "\n\n".join([f"• {chunk}" for chunk in kb_chunks])
         # print(f'**************generated guidance section: {guidance_section}')
         # Step 4: Final prompt
         return f"""
